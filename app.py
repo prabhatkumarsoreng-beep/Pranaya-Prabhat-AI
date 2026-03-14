@@ -1,40 +1,38 @@
 import streamlit as st
 import google.generativeai as genai
 
-# आपकी सही API KEY मैंने यहाँ डाल दी है
+# आपकी चाबी (API KEY)
 API_KEY = "AIzaSyAFgY5-MDv1BVlrPSSa9u8GyOier8V1Vzw"
 
+# एआई को चालू करना
 genai.configure(api_key=API_KEY)
 
-# पेज की सेटिंग
-st.set_page_config(page_title="Pranaya Prabhat AI", page_icon="👸")
+# ऐप की सजावट
+st.set_page_config(page_title="Pranaya AI", page_icon="👸")
+st.title("👸 Pranaya Prabhat AI")
+st.write("नमस्ते प्रभात सर जी! मैं आपकी सेवा में हाज़िर हूँ।")
 
-st.markdown("<h1 style='text-align: center;'>👸 Pranaya Prabhat AI</h1>", unsafe_allow_html=True)
-st.write("नमस्ते प्रभात सर जी! मैं आपकी सहायिका हूँ।")
-
-# चैट याद रखने के लिए
+# मैसेज बॉक्स
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
-        st.markdown(message["content"])
+        st.write(message["content"])
 
-# यूजर से इनपुट लेना
-if prompt := st.chat_input("यहाँ लिखें प्रभात सर जी..."):
+# सवाल पूछना
+if prompt := st.chat_input("यहाँ लिखें..."):
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
-        st.markdown(prompt)
+        st.write(prompt)
 
     try:
         model = genai.GenerativeModel('gemini-1.5-flash')
-        # हिंदी में जवाब देने के लिए निर्देश
-        full_prompt = f"आप एक विनम्र महिला एआई सहायिका हैं। प्रभात सर जी के सवालों का हमेशा सरल और बोलचाल वाली हिंदी में जवाब दें। सवाल: {prompt}"
-        
-        response = model.generate_content(full_prompt)
+        # सीधा और सरल जवाब
+        response = model.generate_content(f"You are a helpful female assistant. Respond to '{prompt}' in friendly Hindi.")
         
         with st.chat_message("assistant"):
-            st.markdown(response.text)
+            st.write(response.text)
         st.session_state.messages.append({"role": "assistant", "content": response.text})
     except Exception as e:
-        st.error("माफ़ करना सर जी, कुछ तकनीकी दिक्कत आ गई है।")
+        st.error("अभी भी कुछ गड़बड़ है। कृपया 'Manage app' में जाकर Logs देखें।")
