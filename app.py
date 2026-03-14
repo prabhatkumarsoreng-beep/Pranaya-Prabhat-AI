@@ -1,31 +1,18 @@
 import streamlit as st
 import google.generativeai as genai
 
-# --- 1. API Key ---
+# आपकी सही API KEY मैंने यहाँ डाल दी है
 API_KEY = "AIzaSyAFgY5-MDv1BVlrPSSa9u8GyOier8V1Vzw"
+
 genai.configure(api_key=API_KEY)
 
-# --- 2. Page Config ---
+# पेज की सेटिंग
 st.set_page_config(page_title="Pranaya Prabhat AI", page_icon="👸")
 
-# --- 3. Style (Mobile Look) ---
-st.markdown("""
-<style>
-.stApp { background-color: #fff0f5; }
-.stChatMessage { border-radius: 15px; }
-</style>
-""", unsafe_allow_html=True)
-
-# --- 4. Title ---
-st.title("👸 Pranaya Prabhat AI")
+st.markdown("<h1 style='text-align: center;'>👸 Pranaya Prabhat AI</h1>", unsafe_allow_html=True)
 st.write("नमस्ते प्रभात सर जी! मैं आपकी सहायिका हूँ।")
 
-# --- 5. AI Settings ---
-instruction = "आपका नाम 'Pranaya Prabhat AI' है। आप प्रभात सर जी की सहायिका हैं। हमेशा एक विनम्र महिला (Female) के लहजे में और सरल हिंदी में बात करें। प्रभात सर जी को हमेशा 'सर जी' कहकर बुलाएं।"
-
-model = genai.GenerativeModel(model_name="gemini-1.5-flash", system_instruction=instruction)
-
-# --- 6. Chat Logic ---
+# चैट याद रखने के लिए
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
@@ -33,21 +20,21 @@ for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
-prompt = st.chat_input("यहाँ लिखें प्रभात सर जी...")
-
-if prompt:
+# यूजर से इनपुट लेना
+if prompt := st.chat_input("यहाँ लिखें प्रभात सर जी..."):
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.markdown(prompt)
 
-    with st.chat_message("assistant"):
-        try:
-            response = model.generate_content(prompt)
-            reply = response.text
-        except:
-            reply = "माफ़ करना सर जी, कुछ तकनीकी दिक्कत आ गई है।"
+    try:
+        model = genai.GenerativeModel('gemini-1.5-flash')
+        # हिंदी में जवाब देने के लिए निर्देश
+        full_prompt = f"आप एक विनम्र महिला एआई सहायिका हैं। प्रभात सर जी के सवालों का हमेशा सरल और बोलचाल वाली हिंदी में जवाब दें। सवाल: {prompt}"
         
-        st.markdown(reply)
-        st.session_state.messages.append({"role": "assistant", "content": reply})
+        response = model.generate_content(full_prompt)
         
-    
+        with st.chat_message("assistant"):
+            st.markdown(response.text)
+        st.session_state.messages.append({"role": "assistant", "content": response.text})
+    except Exception as e:
+        st.error("माफ़ करना सर जी, कुछ तकनीकी दिक्कत आ गई है।")
