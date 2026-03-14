@@ -1,29 +1,22 @@
 import streamlit as st
 import google.generativeai as genai
 
-# आपकी API Key
 API_KEY = "AIzaSyDmuDEkXrSo_FsM1GTse1pslnYLmVh-rUM"
 
-# API configure
 genai.configure(api_key=API_KEY)
 
-# Page setting
 st.set_page_config(page_title="Pranaya Prabhat AI", page_icon="👸")
 
-# Title
 st.title("👸 Pranaya Prabhat AI")
 st.write("नमस्ते प्रभात सर जी! मैं आपकी सेवा में हाज़िर हूँ।")
 
-# Chat history
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-# पुराने message दिखाना
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.write(message["content"])
 
-# User input
 prompt = st.chat_input("यहाँ लिखें...")
 
 if prompt:
@@ -34,11 +27,9 @@ if prompt:
         st.write(prompt)
 
     try:
-        model = genai.GenerativeModel("gemini-pro")
+        model = genai.GenerativeModel("models/gemini-1.5-flash")
 
-        response = model.generate_content(
-            f"आप एक मदद करने वाली महिला assistant हैं। इस सवाल का आसान हिंदी में जवाब दें: {prompt}"
-        )
+        response = model.generate_content(prompt)
 
         answer = response.text
 
